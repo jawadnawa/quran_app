@@ -98,9 +98,22 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               const Divider(thickness: 3, color: Colors.black),
+               Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "أجر لجواد النوايسة ولمن استمع إليه",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Changa",
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
             ],
           ),
-           
+          
         ),
       ),
     );
@@ -113,7 +126,7 @@ class QuranPageBander extends StatefulWidget {
   @override
   State<QuranPageBander> createState() => _QuranPageBanderState();
 }
-
+// قران بندر بليلة
 class _QuranPageBanderState extends State<QuranPageBander> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
@@ -335,7 +348,7 @@ class QuranPageAliJaber extends StatefulWidget {
   @override
   State<QuranPageAliJaber> createState() => _QuranPageAliJaberState();
 }
-
+// قران علي جابر
 class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _isPlaying = false;
