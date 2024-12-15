@@ -39,7 +39,8 @@ class HomePage extends StatelessWidget {
                   // عند الضغط على الصورة، انتقل إلى صفحة الاستماع
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const QuranPageBander()),
+                    MaterialPageRoute(
+                        builder: (context) => const QuranPageBander()),
                   );
                 },
                 child: Padding(
@@ -71,7 +72,8 @@ class HomePage extends StatelessWidget {
                   // عند الضغط على الصورة، انتقل إلى صفحة الاستماع لعلي جابر
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const QuranPageAliJaber()),
+                    MaterialPageRoute(
+                        builder: (context) => const QuranPageAliJaber()),
                   );
                 },
                 child: Padding(
@@ -92,28 +94,28 @@ class HomePage extends StatelessWidget {
                           fontFamily: "Changa",
                         ),
                       ),
-                      
                     ],
                   ),
                 ),
               ),
               const Divider(thickness: 3, color: Colors.black),
-               Padding(
+              Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  "أجر لجواد النوايسة ولمن استمع إليه",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: "Changa",
-                    color: Colors.black87,
+                child: Center(
+                  child: Text(
+                    "أجر لجواد النوايسة ولمن استمع إليه",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Changa",
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-          
         ),
       ),
     );
@@ -126,6 +128,7 @@ class QuranPageBander extends StatefulWidget {
   @override
   State<QuranPageBander> createState() => _QuranPageBanderState();
 }
+
 // قران بندر بليلة
 class _QuranPageBanderState extends State<QuranPageBander> {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -134,17 +137,24 @@ class _QuranPageBanderState extends State<QuranPageBander> {
 
   void _toggleAudio(String surahPath) async {
     if (_isPlaying && _currentSurah == surahPath) {
+      // إذا كان الصوت يعمل لنفس السورة، قم بإيقافه
       await _audioPlayer.pause();
       setState(() {
         _isPlaying = false;
-        _currentSurah = '';
+        _currentSurah =
+            ''; // تعيين السورة الحالية كفارغة لأن الصوت قد تم إيقافه
       });
     } else {
-      await _audioPlayer.stop();
+      // إذا كان الصوت متوقفًا أو السورة ليست هي نفسها
+      if (_isPlaying) {
+        // إذا كان هناك صوت آخر يعمل، قم بإيقافه أولاً
+        await _audioPlayer.stop();
+      }
+      // تشغيل السورة الجديدة
       await _audioPlayer.play(AssetSource(surahPath));
       setState(() {
         _isPlaying = true;
-        _currentSurah = surahPath;
+        _currentSurah = surahPath; // تعيين السورة الحالية
       });
     }
   }
@@ -175,89 +185,89 @@ class _QuranPageBanderState extends State<QuranPageBander> {
       backgroundColor: const Color.fromARGB(244, 255, 255, 255),
       body: SafeArea(
         child: Column(
-         children: [
+          children: [
             // عنصر لسورة مريم
-              ListTile(
-                minVerticalPadding: 20,
-                leading: const CircleAvatar(
-                  backgroundImage: AssetImage("images/bander.webp"),
-                  radius: 50,
-                ),
-                title: const Text(
-                  "سورة مريم - بندر بليلة",
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Changa",
-                  ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isPlaying && _currentSurah == 'quran-1.mp3'
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.green,
-                        size: 30,
-                      ),
-                      onPressed: () => _toggleAudio('quran-1.mp3'),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.replay,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      onPressed: () => _restartAudio('quran-1.mp3'),
-                    ),
-                  ],
+            ListTile(
+              minVerticalPadding: 20,
+              leading: const CircleAvatar(
+                backgroundImage: AssetImage("images/bander.webp"),
+                radius: 50,
+              ),
+              title: const Text(
+                "سورة مريم - بندر بليلة",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Changa",
                 ),
               ),
-              const Divider(thickness: 3, color: Colors.black),
-              // عنصر لسورة الحجر
-              ListTile(
-                minVerticalPadding: 20,
-                leading: const CircleAvatar(
-                  backgroundImage: AssetImage("images/bander.webp"),
-                  radius: 50,
-                ),
-                title: const Text(
-                  "سورة الحجر - بندر بليلة",
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Changa",
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isPlaying && _currentSurah == 'quran-1.mp3'
+                          ? Icons.pause
+                          : Icons.play_arrow,
+                      color: Colors.green,
+                      size: 30,
+                    ),
+                    onPressed: () => _toggleAudio('quran-1.mp3'),
                   ),
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isPlaying && _currentSurah == 'quran-2.mp3'
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        color: Colors.green,
-                        size: 30,
-                      ),
-                      onPressed: () => _toggleAudio('quran-2.mp3'),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.replay,
+                      color: Colors.blue,
+                      size: 30,
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.replay,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      onPressed: () => _restartAudio('quran-2.mp3'),
-                    ),
-                  ],
+                    onPressed: () => _restartAudio('quran-1.mp3'),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(thickness: 3, color: Colors.black),
+            // عنصر لسورة الحجر
+            ListTile(
+              minVerticalPadding: 20,
+              leading: const CircleAvatar(
+                backgroundImage: AssetImage("images/bander.webp"),
+                radius: 50,
+              ),
+              title: const Text(
+                "سورة الحجر - بندر بليلة",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Changa",
                 ),
               ),
-              const Divider(thickness: 3, color: Colors.black),
-              //سورة الفاتحة
-              ListTile(
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isPlaying && _currentSurah == 'quran-2.mp3'
+                          ? Icons.pause
+                          : Icons.play_arrow,
+                      color: Colors.green,
+                      size: 30,
+                    ),
+                    onPressed: () => _toggleAudio('quran-2.mp3'),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.replay,
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                    onPressed: () => _restartAudio('quran-2.mp3'),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(thickness: 3, color: Colors.black),
+            //سورة الفاتحة
+            ListTile(
               minVerticalPadding: 20,
               leading: const CircleAvatar(
                 backgroundImage: AssetImage("images/bander.webp"),
@@ -295,46 +305,46 @@ class _QuranPageBanderState extends State<QuranPageBander> {
                 ],
               ),
             ),
-              Divider(thickness: 3, color: Colors.black),
-              //سورة السجده
-              ListTile(
-  minVerticalPadding: 20,
-  leading: const CircleAvatar(
-    backgroundImage: AssetImage("images/bander.webp"),
-    radius: 50,
-  ),
-  title: const Text(
-    "سورة السجدة - بندر بليلة",
-    style: TextStyle(
-      fontSize: 25,
-      fontWeight: FontWeight.bold,
-      fontFamily: "Changa",
-    ),
-  ),
-  trailing: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      IconButton(
-        icon: Icon(
-          _isPlaying && _currentSurah == 'quran-4.mp3'
-              ? Icons.pause
-              : Icons.play_arrow,
-          color: Colors.green,
-          size: 30,
-        ),
-        onPressed: () => _toggleAudio('quran-4.mp3'),
-      ),
-      IconButton(
-        icon: const Icon(
-          Icons.replay,
-          color: Colors.blue,
-          size: 30,
-        ),
-        onPressed: () => _restartAudio('quran-4.mp3'),
-      ),
-    ],
-  ),
-),
+            Divider(thickness: 3, color: Colors.black),
+            //سورة السجده
+            ListTile(
+              minVerticalPadding: 20,
+              leading: const CircleAvatar(
+                backgroundImage: AssetImage("images/bander.webp"),
+                radius: 50,
+              ),
+              title: const Text(
+                "سورة السجدة - بندر بليلة",
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Changa",
+                ),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isPlaying && _currentSurah == 'quran-4.mp3'
+                          ? Icons.pause
+                          : Icons.play_arrow,
+                      color: Colors.green,
+                      size: 30,
+                    ),
+                    onPressed: () => _toggleAudio('quran-4.mp3'),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.replay,
+                      color: Colors.blue,
+                      size: 30,
+                    ),
+                    onPressed: () => _restartAudio('quran-4.mp3'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -348,6 +358,7 @@ class QuranPageAliJaber extends StatefulWidget {
   @override
   State<QuranPageAliJaber> createState() => _QuranPageAliJaberState();
 }
+
 // قران علي جابر
 class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
   final AudioPlayer _audioPlayer = AudioPlayer();
@@ -356,17 +367,24 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
 
   void _toggleAudio(String surahPath) async {
     if (_isPlaying && _currentSurah == surahPath) {
+      // إذا كان الصوت يعمل لنفس السورة، قم بإيقافه
       await _audioPlayer.pause();
       setState(() {
         _isPlaying = false;
-        _currentSurah = '';
+        _currentSurah =
+            ''; // تعيين السورة الحالية كفارغة لأن الصوت قد تم إيقافه
       });
     } else {
-      await _audioPlayer.stop();
+      // إذا كان الصوت متوقفًا أو السورة ليست هي نفسها
+      if (_isPlaying) {
+        // إذا كان هناك صوت آخر يعمل، قم بإيقافه أولاً
+        await _audioPlayer.stop();
+      }
+      // تشغيل السورة الجديدة
       await _audioPlayer.play(AssetSource(surahPath));
       setState(() {
         _isPlaying = true;
-        _currentSurah = surahPath;
+        _currentSurah = surahPath; // تعيين السورة الحالية
       });
     }
   }
