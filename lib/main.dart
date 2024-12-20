@@ -136,19 +136,19 @@ class _QuranPageBanderState extends State<QuranPageBander> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<Map<String, String>> _surahs = [
-    {"name": "سورة مريم - بندر بليلة", "path": "quran-1.mp3"},
-    {"name": "سورة الحجر - بندر بليلة", "path": "quran-2.mp3"},
-    {"name": "سورة الفاتحة - بندر بليلة", "path": "quran-3.mp3"},
-    {"name": "سورة البقرة - بندر بليلة", "path": "quran-4.mp3"},
-    {"name": "سورة آل عمران - بندر بليلة", "path": "quran-5.mp3"},
-    {"name": "سورة النساء - بندر بليلة", "path": "quran-6.mp3"},
-    {"name": "سورة المائدة - بندر بليلة", "path": "quran-7.mp3"},
-    {"name": "سورة الأنعام - بندر بليلة", "path": "quran-8.mp3"},
-    {"name": "سورة الأعراف - بندر بليلة", "path": "quran-9.mp3"},
-    {"name": "سورة الأنفال - بندر بليلة", "path": "quran-10.mp3"},
-    {"name": "سورة التوبة - بندر بليلة", "path": "quran-11.mp3"},
-    {"name": "سورة يونس - بندر بليلة", "path": "quran-12.mp3"},
-    {"name": "سورة هود - بندر بليلة", "path": "quran-13.mp3"},
+    {"name": "سورة مريم", "path": "quran-1.mp3"},
+    {"name": "سورة الحجر", "path": "quran-2.mp3"},
+    {"name": "سورة الفاتحة", "path": "quran-3.mp3"},
+    {"name": "سورة البقرة", "path": "quran-4.mp3"},
+    {"name": "سورة آل عمران", "path": "quran-5.mp3"},
+    {"name": "سورة النساء", "path": "quran-6.mp3"},
+    {"name": "سورة المائدة", "path": "quran-7.mp3"},
+    {"name": "سورة الأنعام", "path": "quran-8.mp3"},
+    {"name": "سورة الأعراف", "path": "quran-9.mp3"},
+    {"name": "سورة الأنفال", "path": "quran-10.mp3"},
+    {"name": "سورة التوبة", "path": "quran-11.mp3"},
+    {"name": "سورة يونس", "path": "quran-12.mp3"},
+    {"name": "سورة هود", "path": "quran-13.mp3"},
   ];
 
   @override
@@ -216,19 +216,36 @@ class _QuranPageBanderState extends State<QuranPageBander> {
     Duration totalDuration = _totalDurations[surahPath] ?? Duration.zero;
 
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       leading: const CircleAvatar(
-        backgroundImage: AssetImage("images/bander.webp"),
-        radius: 60,
+        backgroundImage: AssetImage("images/bander.webp"), // صورة القارئ
+        radius: 50,
       ),
-      title: Text(
-        surahName,
-        style: const TextStyle(
-          fontSize: 25,
-          fontWeight: FontWeight.bold,
-          fontFamily: "Changa",
-        ),
+      title: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // محاذاة العمود إلى اليسار
+        children: [
+          Text(
+            surahName,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Changa",
+            ),
+          ),
+          const SizedBox(height: 4), // مسافة تفصل بين الاسم واسم القارئ
+          Text(
+            "- بندر بليلة", // اسم القارئ
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              fontFamily: "Changa",
+            ),
+          ),
+        ],
       ),
       subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Slider(
             value: currentPosition.inSeconds.toDouble(),
@@ -362,19 +379,19 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
   final TextEditingController _searchController = TextEditingController();
 
   final List<Map<String, String>> _surahs = [
-    {"name": "سورة مريم - علي جابر", "path": "quran-1.mp3"},
-    {"name": "سورة الحجر - علي جابر", "path": "quran-2.mp3"},
-    {"name": "سورة البقرة - علي جابر", "path": "quran-3.mp3"},
-    {"name": "سورة الكافرون - علي جابر", "path": "quran-4.mp3"},
-    {"name": "سورة الفاتحة - علي جابر", "path": "quran-5.mp3"},
-    {"name": "سورة النساء - علي جابر", "path": "quran-6.mp3"},
-    {"name": "سورة المائدة - علي جابر", "path": "quran-7.mp3"},
-    {"name": "سورة الأنعام - علي جابر", "path": "quran-8.mp3"},
-    {"name": "سورة الأعراف - علي جابر", "path": "quran-9.mp3"},
-    {"name": "سورة الأنفال - علي جابر", "path": "quran-10.mp3"},
-    {"name": "سورة التوبة - علي جابر", "path": "quran-11.mp3"},
-    {"name": "سورة يونس - علي جابر", "path": "quran-12.mp3"},
-    {"name": "سورة هود - علي جابر", "path": "quran-13.mp3"},
+    {"name": "سورة مريم", "path": "quran-1.mp3"},
+    {"name": "سورة الحجر", "path": "quran-2.mp3"},
+    {"name": "سورة الفاتحة", "path": "quran-3.mp3"},
+    {"name": "سورة البقرة", "path": "quran-4.mp3"},
+    {"name": "سورة آل عمران", "path": "quran-5.mp3"},
+    {"name": "سورة النساء", "path": "quran-6.mp3"},
+    {"name": "سورة المائدة", "path": "quran-7.mp3"},
+    {"name": "سورة الأنعام", "path": "quran-8.mp3"},
+    {"name": "سورة الأعراف", "path": "quran-9.mp3"},
+    {"name": "سورة الأنفال", "path": "quran-10.mp3"},
+    {"name": "سورة التوبة", "path": "quran-11.mp3"},
+    {"name": "سورة يونس", "path": "quran-12.mp3"},
+    {"name": "سورة هود", "path": "quran-13.mp3"},
   ];
 
   @override
@@ -442,20 +459,36 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
     Duration totalDuration = _totalDurations[surahPath] ?? Duration.zero;
 
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       leading: const CircleAvatar(
-        backgroundImage: AssetImage("images/ali.jpg"),
-        radius: 60,
-        backgroundColor: Colors.black,
+        backgroundImage: AssetImage("images/ali.jpg"), // صورة القارئ
+        radius: 50,
       ),
-      title: Text(
-        surahName,
-        style: const TextStyle(
-          fontSize: 25,
-          fontWeight: FontWeight.bold,
-          fontFamily: "Changa",
-        ),
+      title: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // محاذاة العمود إلى اليسار
+        children: [
+          Text(
+            surahName,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Changa",
+            ),
+          ),
+          const SizedBox(height: 4), // مسافة تفصل بين الاسم واسم القارئ
+          Text(
+            "- علي جابر" ,// اسم القارئ
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.normal,
+              fontFamily: "Changa",
+            ),
+          ),
+        ],
       ),
       subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Slider(
             value: currentPosition.inSeconds.toDouble(),
@@ -534,7 +567,8 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: _searchController,
-                textDirection: TextDirection.rtl, // ضبط اتجاه النص ليكون من اليمين لليسار
+                textDirection:
+                    TextDirection.rtl, // ضبط اتجاه النص ليكون من اليمين لليسار
                 textAlign: TextAlign.right, // محاذاة النص إلى اليمين
                 decoration: InputDecoration(
                   labelText: 'ابحث عن سورة',
