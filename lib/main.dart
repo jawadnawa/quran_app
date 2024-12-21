@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart'; // استيراد مكتبة provider
 import 'ham.dart';
-import 'settings_page.dart';
+
 
 // 1. ThemeNotifier لإدارة حالة الثيم
 class ThemeNotifier extends ChangeNotifier {
@@ -170,18 +170,6 @@ class QuranPageBander extends StatefulWidget {
 }
 
 class _QuranPageBanderState extends State<QuranPageBander> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
-  String _currentSurah = '';
-  Map<String, Duration> _currentPositions = {};
-  Map<String, Duration> _totalDurations = {};
-
-  // متغير لتخزين نص البحث
-  String _searchText = '';
-  final TextEditingController _searchController = TextEditingController();
-
-  // متغير لتخزين حالة الوضع (Dark/Light)
-
   final List<Map<String, String>> _surahs = [
     {"name": "سورة الفاتحة", "path": "assetsBander/001.mp3"},
     {"name": "سورة البقرة", "path": "assetsBander/002.mp3"},
@@ -298,6 +286,25 @@ class _QuranPageBanderState extends State<QuranPageBander> {
     {"name": "سورة الفلق", "path": "assetsBander/113.mp3"},
     {"name": "سورة الناس", "path": "assetsBander/114.mp3"},
   ];
+  // متغير لتخزين نص البحث
+  String _searchText = '';
+  final TextEditingController _searchController = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+  String _currentSurah = '';
+  Map<String, Duration> _currentPositions = {};
+  Map<String, Duration> _totalDurations = {};
+
+  // متغير لتخزين حالة الوضع (Dark/Light)
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer.onPositionChanged.listen((Duration position) {
+      setState(() {
+        _currentPositions[_currentSurah] = position;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -420,13 +427,15 @@ class _QuranPageBanderState extends State<QuranPageBander> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Slider(
-            value: currentPosition.inSeconds.toDouble(),
-            min: 0.0,
-            max: totalDuration.inSeconds > 0
-                ? totalDuration.inSeconds.toDouble()
-                : 1.0,
-            onChanged: (value) {
-              _audioPlayer.seek(Duration(seconds: value.toInt()));
+            value: _currentPositions[surahPath]?.inSeconds.toDouble() ?? 0.0,
+            max: _totalDurations[surahPath]?.inSeconds.toDouble() ?? 1.0,
+            onChanged: (double value) async {
+              final position = Duration(seconds: value.toInt());
+              await _audioPlayer.seek(position);
+              setState(() {
+                _currentPositions[surahPath] =
+                    position; // تحديث السورة المعينة فقط
+              });
             },
           ),
           Text(
@@ -541,16 +550,6 @@ class QuranPageAliJaber extends StatefulWidget {
 
 // قران علي جابر
 class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
-  String _currentSurah = '';
-  Map<String, Duration> _currentPositions = {};
-  Map<String, Duration> _totalDurations = {};
-
-  // متغير لتخزين نص البحث
-  String _searchText = '';
-  final TextEditingController _searchController = TextEditingController();
-
   final List<Map<String, String>> _surahs = [
     {
       "name": "سورة الفاتحة",
@@ -1009,22 +1008,22 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
       "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-114.ogg"
     },
   ];
+  // متغير لتخزين نص البحث
+  String _searchText = '';
+  final TextEditingController _searchController = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+  String _currentSurah = '';
+  Map<String, Duration> _currentPositions = {};
+  Map<String, Duration> _totalDurations = {};
 
+  // متغير لتخزين حالة الوضع (Dark/Light)
   @override
   void initState() {
     super.initState();
-
-    // مراقبة تغييرات الموقع الحالي
-    _audioPlayer.onPositionChanged.listen((position) {
+    _audioPlayer.onPositionChanged.listen((Duration position) {
       setState(() {
         _currentPositions[_currentSurah] = position;
-      });
-    });
-
-    // مراقبة تغييرات مدة الملف الصوتي
-    _audioPlayer.onDurationChanged.listen((duration) {
-      setState(() {
-        _totalDurations[_currentSurah] = duration;
       });
     });
   }
@@ -1036,28 +1035,32 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
   }
 
   void _toggleAudio(String surahPath) async {
-    if (_isPlaying && _currentSurah == surahPath) {
-      await _audioPlayer.pause();
-      setState(() {
-        _isPlaying = false;
-      });
-    } else {
-      if (_isPlaying) {
-        await _audioPlayer.stop();
-      }
-      await _audioPlayer.play(AssetSource(surahPath));
-      setState(() {
-        _isPlaying = true;
-        _currentSurah = surahPath;
-      });
-
-      // احصل على مدة السورة بعد فترة قصيرة من بدء التشغيل
-      Duration? duration = await _audioPlayer.getDuration();
-      if (duration != null) {
+    try {
+      if (_isPlaying && _currentSurah == surahPath) {
+        await _audioPlayer.pause();
         setState(() {
-          _totalDurations[surahPath] = duration; // قم بتخزين المدة
+          _isPlaying = false;
         });
+      } else {
+        if (_isPlaying) {
+          await _audioPlayer.stop();
+        }
+        await _audioPlayer.play(AssetSource(surahPath));
+        setState(() {
+          _isPlaying = true;
+          _currentSurah = surahPath;
+        });
+
+        // احصل على مدة السورة بعد فترة قصيرة من بدء التشغيل
+        Duration? duration = await _audioPlayer.getDuration();
+        if (duration != null) {
+          setState(() {
+            _totalDurations[surahPath] = duration; // قم بتخزين المدة
+          });
+        }
       }
+    } catch (e) {
+      print('Error occurred: $e');
     }
   }
 
@@ -1146,13 +1149,15 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Slider(
-            value: currentPosition.inSeconds.toDouble(),
-            min: 0.0,
-            max: totalDuration.inSeconds > 0
-                ? totalDuration.inSeconds.toDouble()
-                : 1.0,
-            onChanged: (value) {
-              _audioPlayer.seek(Duration(seconds: value.toInt()));
+            value: _currentPositions[surahPath]?.inSeconds.toDouble() ?? 0.0,
+            max: _totalDurations[surahPath]?.inSeconds.toDouble() ?? 1.0,
+            onChanged: (double value) async {
+              final position = Duration(seconds: value.toInt());
+              await _audioPlayer.seek(position);
+              setState(() {
+                _currentPositions[surahPath] =
+                    position; // تحديث السورة المعينة فقط
+              });
             },
           ),
           Text(
@@ -1172,9 +1177,10 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
 
   String _formatDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$minutes:$seconds';
+    String hours = twoDigits(duration.inHours);
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return '$hours:$minutes:$seconds'; // عرض الساعات أيضًا
   }
 
   @override
