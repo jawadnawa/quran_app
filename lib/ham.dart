@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'settings_page.dart'; // استيراد صفحة الإعدادات
-import 'aboutMe.dart'; // استيراد صفحة عن المطور
+import 'package:url_launcher/url_launcher.dart'; // تأكد من استيراد المكتبة
+import 'about.dart'; // استيراد صفحة عن التطبيق
 
 class DrawerMenu extends StatelessWidget {
   final Function toggleTheme; // دالة لتبديل السمة
   final bool isDarkMode; // حالة الوضع الداكن
 
-  const DrawerMenu({super.key, required this.toggleTheme, required this.isDarkMode});
+  const DrawerMenu(
+      {super.key, required this.toggleTheme, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +28,35 @@ class DrawerMenu extends StatelessWidget {
               ),
             ),
           ),
+          // ListTile(
+          //   title: const Text(
+          //     'قيم التطبيق',
+          //     style: TextStyle(
+          //       fontFamily: "Changa",
+          //       fontSize: 18,
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
+          //   minVerticalPadding: 0,
+          //   subtitle: const Text(
+          //     " قم بتقييم التطبيق 5 ⭐ نجوم لتنشر الخير    (الدال على الخير كفاعلة)"   ,  
+          //     style: TextStyle(
+          //       fontFamily: "Changa",
+          //       fontSize: 15,
+          //     ),
+          //   ),
+          //   onTap: () async {
+          //     const url = 'https://play.google.com/store/apps/details?id=com.simppro.quran.offline&hl=ar';
+          //     if (await canLaunch(url)) {
+          //       await launch(url);
+          //     } else {
+          //       throw 'Could not launch $url';
+          //     }
+          //   },
+          // ),
           ListTile(
             title: const Text(
-              'الإعدادات',
+              'عن المطور',
               style: TextStyle(
                 fontFamily: "Changa",
               ),
@@ -39,13 +66,15 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SettingsPage(), // الانتقال إلى صفحة الإعدادات
+                  builder: (context) =>
+                      const AboutDeveloperPage(), // الانتقال إلى صفحة عن المطور
                 ),
               );
             },
           ),
           ListTile(
-            title: const Text('عن المطور',
+            title: const Text(
+              'عن التطبيق',
               style: TextStyle(
                 fontFamily: "Changa",
               ),
@@ -55,7 +84,8 @@ class DrawerMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AboutDeveloperPage(), // الانتقال إلى صفحة عن المطور
+                  builder: (context) =>
+                      const AboutAppPage(), // الانتقال إلى صفحة عن التطبيق
                 ),
               );
             },

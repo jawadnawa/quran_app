@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:provider/provider.dart'; // استيراد مكتبة provider
 import 'ham.dart';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 // 1. ThemeNotifier لإدارة حالة الثيم
 class ThemeNotifier extends ChangeNotifier {
@@ -49,17 +49,16 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "صفحة القراء",
+          " القارئ بندر بليلة",
           style: TextStyle(
             fontSize: 25,
             fontWeight: FontWeight.bold,
             fontFamily: "Changa",
           ),
         ),
-        // Set the AppBar color based on dark mode state
         backgroundColor: themeProvider.isDarkMode
-            ? Colors.blue // Blue color in dark mode
-            : const Color.fromARGB(255, 255, 255, 255), // White in light mode
+            ? Colors.blue
+            : const Color.fromARGB(255, 255, 255, 255),
         leading: Builder(
           builder: (BuildContext context) {
             return IconButton(
@@ -75,49 +74,100 @@ class HomePage extends StatelessWidget {
         toggleTheme: themeProvider.toggleTheme,
         isDarkMode: themeProvider.isDarkMode,
       ),
-      body: SafeArea(
-        child: Center(
-          child: ListView(
-            shrinkWrap: true,
+      body: Container(
+        decoration: BoxDecoration(
+            image: DecorationImage(
+          image: AssetImage("images/background.jpg"), // إضافة صورة خلفية
+          fit: BoxFit.cover,
+        )),
+        child: SafeArea(
+          child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  "اختر قارئًا للاستماع إلى تلاوات القرآن الكريم.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: "Changa",
-                    color: themeProvider.isDarkMode
-                        ? Colors.white
-                        : const Color.fromARGB(255, 0, 0, 0),
+              Container(
+                height:
+                    MediaQuery.of(context).size.height * 0.6, // 60% من الواجهة
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image:
+                        AssetImage("images/finalbander.png"), // الصورة المطلوبة
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
-              const Divider(
-                  thickness: 3, color: Color.fromARGB(129, 236, 52, 52)),
-              _buildReaderTile(context, "بندر بليلة", "images/bander.webp",
-                  QuranPageBander()),
-              const Divider(thickness: 3, color: Colors.black),
-              _buildReaderTile(context, "علي جابر", "images/ali.jpg",
-                  const QuranPageAliJaber()),
-              const Divider(thickness: 3, color: Colors.black),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    "أجر لجواد النوايسة ولمن استمع إليه",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w500,
-                      fontFamily: "Changa",
-                      color: themeProvider.isDarkMode
-                          ? Colors.white70
-                          : Colors.black87,
+              const SizedBox(height: 20),
+              Text(
+                " بندر بليلة قارئ وإمام الحرم المكي، يتميز بصوت شجي وأسلوب تلاوة مؤثر 🎧. ",
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: "Changa",
+                  color: themeProvider.isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => QuranPageBander()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: themeProvider.isDarkMode
+                              ? Colors.blueGrey
+                              : Colors.blue,
+                          foregroundColor: themeProvider.isDarkMode
+                              ? Colors.white
+                              : Colors.black, // لون النص
+                        ),
+                        child: Text(
+                          "استمع للقرآن",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Changa",
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AzkarPage()),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: themeProvider.isDarkMode
+                              ? Colors.blueGrey
+                              : Colors.blue,
+                          foregroundColor: themeProvider.isDarkMode
+                              ? Colors.white
+                              : Colors.black, // لون النص
+                        ),
+                        child: Text(
+                          "الأذكار",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Changa",
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -132,36 +182,316 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildReaderTile(
-      BuildContext context, String name, String imagePath, Widget page) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => page));
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+Widget buildReaderTile(
+    BuildContext context, String name, String imagePath, Widget page) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundImage: AssetImage(imagePath),
+            radius: 50,
+          ),
+          const SizedBox(width: 20),
+          Text(
+            name,
+            style: const TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Changa",
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class AzkarPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("الأذكار"),
+        backgroundColor: Colors.blue,
+      ),
+      body: Directionality(
+        textDirection: TextDirection.rtl, // تعيين الاتجاه من اليمين إلى اليسار
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
           children: [
-            CircleAvatar(
-              backgroundImage: AssetImage(imagePath),
-              radius: 50,
+            // الصباح
+            buildAzkarSection(
+              context,
+              title: "أذكار الصباح",
+              azkar: [
+                AzkarItem(
+                  title: "آية الكرسي",
+                  subtitle:
+                      "اللّهُ لاَ إِلٰهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ.",
+                ),
+                AzkarItem(
+                  title: "سورة الإخلاص",
+                  subtitle:
+                      "قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ لَمْ يَلِدْ وَلَمْ يُولَدْ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ.",
+                ),
+                AzkarItem(
+                  title: "سورة الفلق",
+                  subtitle:
+                      "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ مِن شَرِّ مَا خَلَقَ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ.",
+                ),
+                AzkarItem(
+                  title: "سورة الناس",
+                  subtitle:
+                      "قُلْ أَعُوذُ بِرَبِّ النَّاسِ مَلِكِ النَّاسِ إِلَهِ النَّاسِ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ مِنَ الْجِنَّةِ وَالنَّاسِ.",
+                ),
+                AzkarItem(
+                  title: "أصبحنا وأصبح الملك لله",
+                  subtitle:
+                      "أصبحنا وأصبح الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير. رب أسألك خير ما في هذا اليوم وخير ما بعده، وأعوذ بك من شر ما في هذا اليوم وشر ما بعده. رب أعوذ بك من الكسل وسوء الكبر. رب أعوذ بك من عذاب في النار وعذاب في القبر.",
+                ),
+                AzkarItem(
+                  title: "اللهم بك أصبحنا",
+                  subtitle:
+                      "اللهم بك أصبحنا، وبك أمسينا، وبك نحيا، وبك نموت، وإليك النشور.",
+                ),
+                AzkarItem(
+                  title: "اللهم أنت ربي",
+                  subtitle:
+                      "اللهم أنت ربي، لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك علي، وأبوء بذنبي، فاغفر لي، فإنه لا يغفر الذنوب إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أصبحت أشهدك",
+                  subtitle:
+                      "اللهم إني أصبحت أشهدك، وأشهد حملة عرشك، وملائكتك، وجميع خلقك، أنك أنت الله لا إله إلا أنت، وحدك لا شريك لك، وأن محمدًا عبدك ورسولك.",
+                ),
+                AzkarItem(
+                  title: "اللهم ما أصبح بي من نعمة",
+                  subtitle:
+                      "اللهم ما أصبح بي من نعمة أو بأحد من خلقك، فمنك وحدك لا شريك لك، فلك الحمد ولك الشكر.",
+                ),
+                AzkarItem(
+                  title: "حسبي الله لا إله إلا هو",
+                  subtitle:
+                      "حسبي الله لا إله إلا هو، عليه توكلت وهو رب العرش العظيم.",
+                ),
+                AzkarItem(
+                  title: "بسم الله الذي لا يضر مع اسمه شيء",
+                  subtitle:
+                      "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم.",
+                ),
+                AzkarItem(
+                  title: "رضيت بالله ربا",
+                  subtitle:
+                      "رضيت بالله ربا، وبالإسلام دينا، وبمحمد صلى الله عليه وسلم نبيا.",
+                ),
+                AzkarItem(
+                  title: "يا حي يا قيوم",
+                  subtitle:
+                      "يا حي يا قيوم، برحمتك أستغيث، أصلح لي شأني كله، ولا تكلني إلى نفسي طرفة عين.",
+                ),
+                AzkarItem(
+                  title: "سبحان الله وبحمده",
+                  subtitle:
+                      "سبحان الله وبحمده، عدد خلقه، ورضا نفسه، وزنة عرشه، ومداد كلماته.",
+                ),
+                AzkarItem(
+                  title: "اللهم عافني في بدني",
+                  subtitle:
+                      "اللهم عافني في بدني، اللهم عافني في سمعي، اللهم عافني في بصري، لا إله إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أعوذ بك من الكفر",
+                  subtitle:
+                      "اللهم إني أعوذ بك من الكفر، والفقر، وأعوذ بك من عذاب القبر، لا إله إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أسألك العفو والعافية",
+                  subtitle:
+                      "اللهم إني أسألك العفو والعافية في الدنيا والآخرة، اللهم إني أسألك العفو والعافية في ديني ودنياي، وأهلي ومالي، اللهم استر عوراتي، وآمن روعاتي، واحفظني من بين يدي، ومن خلفي، وعن يميني، وعن شمالي، ومن فوقي، وأعوذ بعظمتك أن أغتال من تحتي.",
+                ),
+                AzkarItem(
+                  title: "اللهم عالم الغيب والشهادة",
+                  subtitle:
+                      "اللهم عالم الغيب والشهادة، فاطر السماوات والأرض، رب كل شيء ومليكه، أشهد أن لا إله إلا أنت، أعوذ بك من شر نفسي، ومن شر الشيطان وشركه، وأن أقترف على نفسي سوءا، أو أجره إلى مسلم.",
+                ),
+                AzkarItem(
+                  title: "أعوذ بكلمات الله التامات",
+                  subtitle: "أعوذ بكلمات الله التامات من شر ما خلق.",
+                ),
+                AzkarItem(
+                  title: "اللهم صل وسلم على نبينا محمد",
+                  subtitle: "اللهم صل وسلم على نبينا محمد.",
+                ),
+              ],
             ),
-            const SizedBox(width: 20),
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Changa",
-              ),
-            ),
+            const Divider(thickness: 2),
+            // المساء
+            buildAzkarSection(
+              context,
+              title: "أذكار المساء",
+              azkar: [
+                AzkarItem(
+                  title: "آية الكرسي",
+                  subtitle:
+                      "اللّهُ لاَ إِلٰهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ.",
+                ),
+                AzkarItem(
+                  title: "سورة الإخلاص",
+                  subtitle:
+                      "قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ لَمْ يَلِدْ وَلَمْ يُولَدْ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ.",
+                ),
+                AzkarItem(
+                  title: "سورة الفلق",
+                  subtitle:
+                      "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ مِن شَرِّ مَا خَلَقَ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ.",
+                ),
+                AzkarItem(
+                  title: "سورة الناس",
+                  subtitle:
+                      "قُلْ أَعُوذُ بِرَبِّ النَّاسِ مَلِكِ النَّاسِ إِلَهِ النَّاسِ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ مِنَ الْجِنَّةِ وَالنَّاسِ.",
+                ),
+                AzkarItem(
+                  title: "أمسينا وأمسى الملك لله",
+                  subtitle:
+                      "أمسينا وأمسى الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير. رب أسألك خير ما في هذه الليلة وخير ما بعدها، وأعوذ بك من شر ما في هذه الليلة وشر ما بعدها. رب أعوذ بك من الكسل وسوء الكبر. رب أعوذ بك من عذاب في النار وعذاب في القبر.",
+                ),
+                AzkarItem(
+                  title: "اللهم بك أمسينا",
+                  subtitle:
+                      "اللهم بك أمسينا، وبك أصبحنا، وبك نحيا، وبك نموت، وإليك المصير.",
+                ),
+                AzkarItem(
+                  title: "اللهم أنت ربي",
+                  subtitle:
+                      "اللهم أنت ربي، لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك علي، وأبوء بذنبي، فاغفر لي، فإنه لا يغفر الذنوب إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أمسيت أشهدك",
+                  subtitle:
+                      "اللهم إني أمسيت أشهدك، وأشهد حملة عرشك، وملائكتك، وجميع خلقك، أنك أنت الله لا إله إلا أنت، وحدك لا شريك لك، وأن محمدًا عبدك ورسولك.",
+                ),
+                AzkarItem(
+                  title: "اللهم ما أمسى بي من نعمة",
+                  subtitle:
+                      "اللهم ما أمسى بي من نعمة أو بأحد من خلقك، فمنك وحدك لا شريك لك، فلك الحمد ولك الشكر.",
+                ),
+                AzkarItem(
+                  title: "حسبي الله لا إله إلا هو",
+                  subtitle:
+                      "حسبي الله لا إله إلا هو، عليه توكلت وهو رب العرش العظيم.",
+                ),
+                AzkarItem(
+                  title: "بسم الله الذي لا يضر مع اسمه شيء",
+                  subtitle:
+                      "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم.",
+                ),
+                AzkarItem(
+                  title: "رضيت بالله ربا",
+                  subtitle:
+                      "رضيت بالله ربا، وبالإسلام دينا، وبمحمد صلى الله عليه وسلم نبيا.",
+                ),
+                AzkarItem(
+                  title: "يا حي يا قيوم",
+                  subtitle:
+                      "يا حي يا قيوم، برحمتك أستغيث، أصلح لي شأني كله، ولا تكلني إلى نفسي طرفة عين.",
+                ),
+                AzkarItem(
+                  title: "سبحان الله وبحمده",
+                  subtitle:
+                      "سبحان الله وبحمده، عدد خلقه، ورضا نفسه، وزنة عرشه، ومداد كلماته.",
+                ),
+                AzkarItem(
+                  title: "اللهم عافني في بدني",
+                  subtitle:
+                      "اللهم عافني في بدني، اللهم عافني في سمعي، اللهم عافني في بصري، لا إله إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أعوذ بك من الكفر",
+                  subtitle:
+                      "اللهم إني أعوذ بك من الكفر، والفقر، وأعوذ بك من عذاب القبر، لا إله إلا أنت.",
+                ),
+                AzkarItem(
+                  title: "اللهم إني أسألك العفو والعافية",
+                  subtitle:
+                      "اللهم إني أسألك العفو والعافية في الدنيا والآخرة، اللهم إني أسألك العفو والعافية في ديني ودنياي، وأهلي ومالي، اللهم استر عوراتي، وآمن روعاتي، واحفظني من بين يدي، ومن خلفي، وعن يميني، وعن شمالي، ومن فوقي، وأعوذ بعظمتك أن أغتال من تحتي.",
+                ),
+                AzkarItem(
+                  title: "اللهم عالم الغيب والشهادة",
+                  subtitle:
+                      "اللهم عالم الغيب والشهادة، فاطر السماوات والأرض، رب كل شيء ومليكه، أشهد أن لا إله إلا أنت، أعوذ بك من شر نفسي، ومن شر الشيطان وشركه، وأن أقترف على نفسي سوءا، أو أجره إلى مسلم.",
+                ),
+                AzkarItem(
+                  title: "أعوذ بكلمات الله التامات",
+                  subtitle: "أعوذ بكلمات الله التامات من شر ما خلق.",
+                ),
+                AzkarItem(
+                  title: "اللهم صل وسلم على نبينا محمد",
+                  subtitle: "اللهم صل وسلم على نبينا محمد.",
+                ),
+              ],
+            )
           ],
         ),
       ),
     );
   }
+
+  Widget buildAzkarSection(BuildContext context,
+      {required String title, required List<AzkarItem> azkar}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Changa",
+            ),
+          ),
+        ),
+        ...azkar.map((item) => buildAzkarTile(item)).toList(),
+      ],
+    );
+  }
+
+  Widget buildAzkarTile(AzkarItem item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        title: Text(
+          item.title,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: "Changa",
+          ),
+        ),
+        subtitle: Text(
+          item.subtitle,
+          style: const TextStyle(
+            fontFamily: "Changa",
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AzkarItem {
+  final String title;
+  final String subtitle;
+
+  AzkarItem({required this.title, required this.subtitle});
 }
 
 class QuranPageBander extends StatefulWidget {
@@ -171,841 +501,575 @@ class QuranPageBander extends StatefulWidget {
 
 class _QuranPageBanderState extends State<QuranPageBander> {
   final List<Map<String, String>> _surahs = [
-    {"name": "سورة الفاتحة", "path": "assetsBander/001.mp3"},
-    {"name": "سورة البقرة", "path": "assetsBander/002.mp3"},
-    {"name": "سورة آل عمران", "path": "assetsBander/003.mp3"},
-    {"name": "سورة النساء", "path": "assetsBander/004.mp3"},
-    {"name": "سورة المائدة", "path": "assetsBander/005.mp3"},
-    {"name": "سورة الأنعام", "path": "assetsBander/006.mp3"},
-    {"name": "سورة الأعراف", "path": "assetsBander/007.mp3"},
-    {"name": "سورة الأنفال", "path": "assetsBander/008.mp3"},
-    {"name": "سورة التوبة", "path": "assetsBander/009.mp3"},
-    {"name": "سورة يونس", "path": "assetsBander/010.mp3"},
-    {"name": "سورة هود", "path": "assetsBander/011.mp3"},
-    {"name": "سورة يوسف", "path": "assetsBander/012.mp3"},
-    {"name": "سورة الرعد", "path": "assetsBander/013.mp3"},
-    {"name": "سورة إبراهيم", "path": "assetsBander/014.mp3"},
-    {"name": "سورة الحجر", "path": "assetsBander/015.mp3"},
-    {"name": "سورة النحل", "path": "assetsBander/016.mp3"},
-    {"name": "سورة الإسراء", "path": "assetsBander/017.mp3"},
-    {"name": "سورة الكهف", "path": "assetsBander/018.mp3"},
-    {"name": "سورة مريم", "path": "assetsBander/019.mp3"},
-    {"name": "سورة طه", "path": "assetsBander/020.mp3"},
-    {"name": "سورة الأنبياء", "path": "assetsBander/021.mp3"},
-    {"name": "سورة الحج", "path": "assetsBander/022.mp3"},
-    {"name": "سورة المؤمنون", "path": "assetsBander/023.mp3"},
-    {"name": "سورة النور", "path": "assetsBander/024.mp3"},
-    {"name": "سورة الفرقان", "path": "assetsBander/025.mp3"},
-    {"name": "سورة الشعراء", "path": "assetsBander/026.mp3"},
-    {"name": "سورة النمل", "path": "assetsBander/027.mp3"},
-    {"name": "سورة القصص", "path": "assetsBander/028.mp3"},
-    {"name": "سورة العنكبوت", "path": "assetsBander/029.mp3"},
-    {"name": "سورة الروم", "path": "assetsBander/030.mp3"},
-    {"name": "سورة لقمان", "path": "assetsBander/031.mp3"},
-    {"name": "سورة السجدة", "path": "assetsBander/032.mp3"},
-    {"name": "سورة الأحزاب", "path": "assetsBander/033.mp3"},
-    {"name": "سورة سبأ", "path": "assetsBander/034.mp3"},
-    {"name": "سورة فاطر", "path": "assetsBander/035.mp3"},
-    {"name": "سورة يس", "path": "assetsBander/036.mp3"},
-    {"name": "سورة الصافات", "path": "assetsBander/037.mp3"},
-    {"name": "سورة ص", "path": "assetsBander/038.mp3"},
-    {"name": "سورة الزمر", "path": "assetsBander/039.mp3"},
-    {"name": "سورة غافر", "path": "assetsBander/040.mp3"},
-    {"name": "سورة فصلت", "path": "assetsBander/041.mp3"},
-    {"name": "سورة الشورى", "path": "assetsBander/042.mp3"},
-    {"name": "سورة الزخرف", "path": "assetsBander/043.mp3"},
-    {"name": "سورة الدخان", "path": "assetsBander/044.mp3"},
-    {"name": "سورة الجاثية", "path": "assetsBander/045.mp3"},
-    {"name": "سورة الأحقاف", "path": "assetsBander/046.mp3"},
-    {"name": "سورة محمد", "path": "assetsBander/047.mp3"},
-    {"name": "سورة الفتح", "path": "assetsBander/048.mp3"},
-    {"name": "سورة الحجرات", "path": "assetsBander/049.mp3"},
-    {"name": "سورة ق", "path": "assetsBander/050.mp3"},
-    {"name": "سورة الذاريات", "path": "assetsBander/051.mp3"},
-    {"name": "سورة الطور", "path": "assetsBander/052.mp3"},
-    {"name": "سورة النجم", "path": "assetsBander/053.mp3"},
-    {"name": "سورة القمر", "path": "assetsBander/054.mp3"},
-    {"name": "سورة الرحمن", "path": "assetsBander/055.mp3"},
-    {"name": "سورة الواقعة", "path": "assetsBander/056.mp3"},
-    {"name": "سورة الحديد", "path": "assetsBander/057.mp3"},
-    {"name": "سورة المجادلة", "path": "assetsBander/058.mp3"},
-    {"name": "سورة الحشر", "path": "assetsBander/059.mp3"},
-    {"name": "سورة الممتحنة", "path": "assetsBander/060.mp3"},
-    {"name": "سورة الصف", "path": "assetsBander/061.mp3"},
-    {"name": "سورة الجمعة", "path": "assetsBander/062.mp3"},
-    {"name": "سورة المنافقون", "path": "assetsBander/063.mp3"},
-    {"name": "سورة التغابن", "path": "assetsBander/064.mp3"},
-    {"name": "سورة الطلاق", "path": "assetsBander/065.mp3"},
-    {"name": "سورة التحريم", "path": "assetsBander/066.mp3"},
-    {"name": "سورة الملك", "path": "assetsBander/067.mp3"},
-    {"name": "سورة القلم", "path": "assetsBander/068.mp3"},
-    {"name": "سورة الحاقة", "path": "assetsBander/069.mp3"},
-    {"name": "سورة المعارج", "path": "assetsBander/070.mp3"},
-    {"name": "سورة نوح", "path": "assetsBander/071.mp3"},
-    {"name": "سورة الجن", "path": "assetsBander/072.mp3"},
-    {"name": "سورة المزمل", "path": "assetsBander/073.mp3"},
-    {"name": "سورة المدثر", "path": "assetsBander/074.mp3"},
-    {"name": "سورة القيامة", "path": "assetsBander/075.mp3"},
-    {"name": "سورة الإنسان", "path": "assetsBander/076.mp3"},
-    {"name": "سورة المرسلات", "path": "assetsBander/077.mp3"},
-    {"name": "سورة النبأ", "path": "assetsBander/078.mp3"},
-    {"name": "سورة النازعات", "path": "assetsBander/079.mp3"},
-    {"name": "سورة عبس", "path": "assetsBander/080.mp3"},
-    {"name": "سورة التكوير", "path": "assetsBander/081.mp3"},
-    {"name": "سورة الإنفطار", "path": "assetsBander/082.mp3"},
-    {"name": "سورة المطففين", "path": "assetsBander/083.mp3"},
-    {"name": "سورة الإنشقاق", "path": "assetsBander/084.mp3"},
-    {"name": "سورة البروج", "path": "assetsBander/085.mp3"},
-    {"name": "سورة الطارق", "path": "assetsBander/086.mp3"},
-    {"name": "سورة الأعلى", "path": "assetsBander/087.mp3"},
-    {"name": "سورة الغاشية", "path": "assetsBander/088.mp3"},
-    {"name": "سورة الفجر", "path": "assetsBander/089.mp3"},
-    {"name": "سورة البلد", "path": "assetsBander/090.mp3"},
-    {"name": "سورة الشمس", "path": "assetsBander/091.mp3"},
-    {"name": "سورة الليل", "path": "assetsBander/092.mp3"},
-    {"name": "سورة الضحى", "path": "assetsBander/093.mp3"},
-    {"name": "سورة الشرح", "path": "assetsBander/094.mp3"},
-    {"name": "سورة التين", "path": "assetsBander/095.mp3"},
-    {"name": "سورة العلق", "path": "assetsBander/096.mp3"},
-    {"name": "سورة القدر", "path": "assetsBander/097.mp3"},
-    {"name": "سورة البينة", "path": "assetsBander/098.mp3"},
-    {"name": "سورة الزلزلة", "path": "assetsBander/099.mp3"},
-    {"name": "سورة العاديات", "path": "assetsBander/100.mp3"},
-    {"name": "سورة القارعة", "path": "assetsBander/101.mp3"},
-    {"name": "سورة التكاثر", "path": "assetsBander/102.mp3"},
-    {"name": "سورة العصر", "path": "assetsBander/103.mp3"},
-    {"name": "سورة الهمزة", "path": "assetsBander/104.mp3"},
-    {"name": "سورة الفيل", "path": "assetsBander/105.mp3"},
-    {"name": "سورة قريش", "path": "assetsBander/106.mp3"},
-    {"name": "سورة الماعون", "path": "assetsBander/107.mp3"},
-    {"name": "سورة الكوثر", "path": "assetsBander/108.mp3"},
-    {"name": "سورة الكافرون", "path": "assetsBander/109.mp3"},
-    {"name": "سورة النصر", "path": "assetsBander/110.mp3"},
-    {"name": "سورة المسد", "path": "assetsBander/111.mp3"},
-    {"name": "سورة الإخلاص", "path": "assetsBander/112.mp3"},
-    {"name": "سورة الفلق", "path": "assetsBander/113.mp3"},
-    {"name": "سورة الناس", "path": "assetsBander/114.mp3"},
-  ];
-  // متغير لتخزين نص البحث
-  String _searchText = '';
-  final TextEditingController _searchController = TextEditingController();
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
-  String _currentSurah = '';
-  Map<String, Duration> _currentPositions = {};
-  Map<String, Duration> _totalDurations = {};
-
-  // متغير لتخزين حالة الوضع (Dark/Light)
-  @override
-  void initState() {
-    super.initState();
-    _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _currentPositions[_currentSurah] = position;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose(); // تأكد من تفريغ المتحكم عند التخلص من الصفحة
-    super.dispose();
-  }
-
-  void _toggleAudio(String surahPath) async {
-    try {
-      if (_isPlaying && _currentSurah == surahPath) {
-        await _audioPlayer.pause();
-        setState(() {
-          _isPlaying = false;
-        });
-      } else {
-        if (_isPlaying) {
-          await _audioPlayer.stop();
-        }
-        await _audioPlayer.play(AssetSource(surahPath));
-        setState(() {
-          _isPlaying = true;
-          _currentSurah = surahPath;
-        });
-
-        // احصل على مدة السورة بعد فترة قصيرة من بدء التشغيل
-        Duration? duration = await _audioPlayer.getDuration();
-        if (duration != null) {
-          setState(() {
-            _totalDurations[surahPath] = duration; // قم بتخزين المدة
-          });
-        }
-      }
-    } catch (e) {
-      print('Error occurred: $e');
-    }
-  }
-
-  void _restartAudio(String surahPath) async {
-    await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource(surahPath));
-    setState(() {
-      _isPlaying = true;
-      _currentSurah = surahPath;
-    });
-  }
-
-  ListTile addSurah(String surahName, String surahPath) {
-    Duration currentPosition = _currentPositions[surahPath] ?? Duration.zero;
-    Duration totalDuration = _totalDurations[surahPath] ?? Duration.zero;
-
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      leading: Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: const CircleAvatar(
-          backgroundImage: AssetImage("images/bander.webp"), // صورة القارئ
-          radius: 50,
-        ),
-      ),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  surahName,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "Changa",
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors
-                            .black, // التبديل بين الأبيض والأسود بناءً على الثيم
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "- بندر بليلة", // اسم القارئ
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    fontFamily: "Changa",
-                    color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white70
-                        : Colors
-                            .black87, // التبديل بين الأبيض والأسود بناءً على الثيم
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                icon: Icon(
-                  _isPlaying && _currentSurah == surahPath
-                      ? Icons.pause
-                      : Icons.play_arrow,
-                  color: Colors.green,
-                  size: 30,
-                ),
-                onPressed: () => _toggleAudio(surahPath),
-              ),
-              IconButton(
-                icon: const Icon(
-                  Icons.replay,
-                  color: Colors.blue,
-                  size: 30,
-                ),
-                onPressed: () => _restartAudio(surahPath),
-              ),
-            ],
-          ),
-        ],
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Slider(
-            value: _currentPositions[surahPath]?.inSeconds.toDouble() ?? 0.0,
-            max: _totalDurations[surahPath]?.inSeconds.toDouble() ?? 1.0,
-            onChanged: (double value) async {
-              final position = Duration(seconds: value.toInt());
-              await _audioPlayer.seek(position);
-              setState(() {
-                _currentPositions[surahPath] =
-                    position; // تحديث السورة المعينة فقط
-              });
-            },
-          ),
-          Text(
-            '${_formatDuration(currentPosition)} / ${_formatDuration(totalDuration)}',
-            style: TextStyle(
-              fontSize: 16,
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.white70
-                  : Colors
-                      .black87, // التبديل بين الأبيض والأسود بناءً على الثيم
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String hours = twoDigits(duration.inHours);
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$hours:$minutes:$seconds'; // عرض الساعات أيضًا
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final filteredSurahs = _surahs.where((surah) {
-      return surah["name"]!.contains(_searchText);
-    }).toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.blue
-            : null, // الأزرق للوضع المظلم، والافتراضي للوضع الفاتح
-        title: Text(
-          "Quran Recitation - بندر بليلة",
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            fontFamily: "Changa",
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              context.watch<ThemeNotifier>().isDarkMode
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
-            ),
-            onPressed: () {
-              context
-                  .read<ThemeNotifier>()
-                  .toggleTheme(); // التبديل بين الوضعين
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _searchController,
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  labelText: 'ابحث عن سورة',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _searchText = value;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredSurahs.length,
-                itemBuilder: (context, index) {
-                  final surah = filteredSurahs[index];
-                  return addSurah(surah["name"]!, surah["path"]!);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<ThemeNotifier>().toggleTheme(); // التبديل بين الوضعين
-        },
-        child: Icon(
-          context.watch<ThemeNotifier>().isDarkMode
-              ? Icons.wb_sunny
-              : Icons.nights_stay,
-        ),
-      ),
-    );
-  }
-}
-
-class QuranPageAliJaber extends StatefulWidget {
-  const QuranPageAliJaber({super.key});
-
-  @override
-  State<QuranPageAliJaber> createState() => _QuranPageAliJaberState();
-}
-
-// قران علي جابر
-class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
-  final List<Map<String, String>> _surahs = [
     {
       "name": "سورة الفاتحة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-001.ogg"
+      "path":
+          "https://drive.google.com/uc?export=download&id=1_OBkHObS1ZU_REn_KdMsge6k_rP0V6hn"
     },
     {
       "name": "سورة البقرة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-002.ogg"
+      "path":
+          "https://drive.google.com/uc?export=download&id=1f3DbXWnFNRh1CN21TraGQtTmaVJzCMPI"
     },
     {
-      "name": "سورة آل عمران",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-003.ogg"
+      "name": "سورة آل عمران", // رقم السورة: 3
+      "path":
+          "https://drive.google.com/uc?export=download&id=1lSKQMBCqdBKjOzqKy_Y2XohsUT4M5hbQ"
     },
     {
       "name": "سورة النساء",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-004.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1HaUCtuorNpYM_na8AWqqaLIseyFVWYgn&export=download"
     },
     {
       "name": "سورة المائدة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-005.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1LqdAFI21u2KrqOeObjynMPX_koNQjPj7&export=download"
     },
     {
       "name": "سورة الأنعام",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-006.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1O1aR4cssP1zdtVb3__BnSoO9LcRGQ2AV&export=download"
     },
     {
       "name": "سورة الأعراف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-007.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1yZMK2YYTSyFNYcCmMph69i-Hpk4s_otS&export=download"
     },
     {
       "name": "سورة الأنفال",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-008.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1E6vK-ybdeZjwKcvsRw0oKzFqhVR1AW5w&export=download"
     },
     {
       "name": "سورة التوبة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-009.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1sT3FBOTSbAhPHUNosEkT0cvWxruNAXx5&export=download"
     },
     {
       "name": "سورة يونس",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-010.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1wUkS_VPoiKvDec4B2aPkEqtaGE_wDTq3&export=download"
     },
     {
       "name": "سورة هود",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-011.ogg"
+      "path":
+          "https://drive.google.com/uc?id=11bvbVbigOv-GSpYuPFNseK1doNOI9iL2&export=download"
     },
     {
       "name": "سورة يوسف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-012.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1Dw8SPZLyC0exkx3IZVCs8gUUugjxXDWd&export=download"
     },
     {
       "name": "سورة الرعد",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-013.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1XhqdxAYZUV-Dsebh8eDXWZgERzXKvODv&export=download"
     },
     {
       "name": "سورة إبراهيم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-014.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1G45C8yXQ7raARQE4s9vgUubI-pjeNkq5&export=download"
     },
     {
       "name": "سورة الحجر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-015.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1om0UYynUOEQPCPc4J2mEEY8yUcfan03Y&export=download"
     },
     {
       "name": "سورة النحل",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-016.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1QIWPS4PwrXhuSrziklJz_2klr4zYB7R-&export=download"
     },
     {
       "name": "سورة الإسراء",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-017.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1Oj5Ac2yATwVULucxbECGI17CarjNz3_p&export=download"
     },
     {
       "name": "سورة الكهف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-018.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1DhLjq3jFtqWkZfPKo_h4u59pWyOoO2H4&export=download"
     },
     {
       "name": "سورة مريم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-019.ogg"
+      "path":
+          "https://drive.google.com/uc?id=177p4eHa4jxo6m_FcmG3WK8yjfLXvzTCj&export=download"
     },
     {
       "name": "سورة طه",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-020.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1SCtw_fJmrqOa7cpmPqSmWJ3rRyjGiz9U&export=download"
     },
     {
       "name": "سورة الأنبياء",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-021.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1rKlquLMXneL1t_ueJ1BgHHl7nxvCdQLn&export=download"
     },
     {
       "name": "سورة الحج",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-022.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1baGIcw7kRas0WycnSSasYUuDuXOCI-Dw&export=download"
     },
     {
       "name": "سورة المؤمنون",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-023.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1VwPPqMoZzzG_iNp-XzpgwUCIDeEFbdB0&export=download"
     },
     {
       "name": "سورة النور",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-024.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1zeEUtupjuPzRV_RWZrnywK67p7eamhWx&export=download"
     },
     {
       "name": "سورة الفرقان",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-025.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1HOfpO5DZUi0bQ76pthCnBKBjflQUeF__&export=download"
     },
     {
       "name": "سورة الشعراء",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-026.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1WvYWRjZjcfDOKd6krRPlFs2DE3ea6mvl&export=download"
     },
     {
       "name": "سورة النمل",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-027.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1wLZQM25ObYFD406nQSPveSNpIm9UAHln&export=download"
     },
     {
       "name": "سورة القصص",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-028.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1AykucsZOQVPwB1Gs6qq-rZyV9v5h7B-P&export=download"
     },
     {
       "name": "سورة العنكبوت",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-029.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1VG41qqRLrGo-dG-g2ZGEe3dItRzn2u4O&export=download"
     },
     {
       "name": "سورة الروم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-030.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1lnlJmaMjD2XB20bQOsXbfuC04UZifVgq&export=download"
     },
     {
       "name": "سورة لقمان",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-031.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1jt5dQnakA0u0SueL0A-I04i5JiO5kKyI&export=download"
     },
     {
       "name": "سورة السجدة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-032.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1nzJGqpEgceyJkMvc_uHOaP-hjnfEKAoZ&export=download"
     },
     {
       "name": "سورة الأحزاب",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-033.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1pdvNZ1_rY2zCT8H_vaFK4WQV-zSY4sYy&export=download"
     },
     {
       "name": "سورة سبأ",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-034.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1gG-DQ4c-y9shv0Pmnr8mlkQav_V8C7Aj&export=download"
     },
     {
       "name": "سورة فاطر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-035.ogg"
+      "path":
+          "https://drive.google.com/uc?id=19JFlIE3XwOAk5ThBWBs9qP5Lg0ZOabEi&export=download"
     },
     {
       "name": "سورة يس",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-036.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1ELXHGqL6XnR_l9X_XqVW6wBPvMGf6bqn&export=download"
     },
     {
       "name": "سورة الصافات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-037.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1ZJ35QBynnL6HR9Q4tkn0CumKZvKtDhwt&export=download"
     },
     {
       "name": "سورة ص",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-038.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1j6WoIOitGoUNDAEdSCNRPX2IbcRsuyCs&export=download"
     },
     {
       "name": "سورة الزمر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-039.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1RoDeNTgN7ANV5vn94RIOT0_D63b5agJp&export=download"
     },
     {
       "name": "سورة غافر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-040.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1YDJ57L5xFiWnKGPzuk_smPIm7LGuorq0&export=download"
     },
     {
       "name": "سورة فصلت",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-041.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1sqg7-WYUpdsEMZNUUz-x4qHui-EnSmZh&export=download"
     },
     {
       "name": "سورة الشورى",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-042.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1Zsgjm3zf5AurBegFQvsW7-ajHDsaSo-k&export=download"
     },
     {
       "name": "سورة الزخرف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-043.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1hh2F1TlTOiCm3c5DwHetWQbrxC1Biexh&export=download"
     },
     {
       "name": "سورة الدخان",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-044.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1_gbBIk4102raVK9bHp-lr-y2OK3u7xuE&export=download"
     },
     {
       "name": "سورة الجاثية",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-045.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1mY5M1U5Q5WR5V7DCbA0QJR6f3qVWO8wF&export=download"
     },
     {
       "name": "سورة الأحقاف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-046.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1awwMHHJ6i0uwc1sMq0RD1g0H2rP7Slmj&export=download"
     },
     {
       "name": "سورة محمد",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-047.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1ViPqxbrSz1V1Ts6vk_BGUasJ9l22CkJ3&export=download"
     },
     {
       "name": "سورة الفتح",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-048.ogg"
+      "path":
+          "https://drive.google.com/uc?id=19LiQkKNK130YvO102h2W2D0D27DOE531&export=download"
     },
     {
       "name": "سورة الحجرات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-049.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1ANISqW7uiiNmJ4t-AxW6UkGa7Z_WzKEU&export=download"
     },
     {
       "name": "سورة ق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-050.ogg"
+      "path":
+          "https://drive.google.com/uc?id=15DeeViRoZCUFLVvsUG8F5-kj3oMmL-Tr&export=download"
     },
     {
       "name": "سورة الذاريات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-051.ogg"
+      "path":
+          "https://drive.google.com/uc?id=14ryzfwWJG8QTOnLapfJeaKUc14-wkXS1&export=download"
     },
     {
       "name": "سورة الطور",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-052.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1JgmupP_0xIEMB08qIlgeZDd4asWAbpZ-&export=download"
     },
     {
       "name": "سورة النجم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-053.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1gSvJ34-sPyPrRbYCIQj1eR1T9n0wqnsZ&export=download"
     },
     {
       "name": "سورة القمر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-054.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1HsVVSFlP8rIo71jK5peFaK0ujIF0UJVD&export=download"
     },
     {
       "name": "سورة الرحمن",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-055.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1RMW1uWb4vwfCWAKbnpdgE6EFMk_tq0-t&export=download"
     },
     {
       "name": "سورة الواقعة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-056.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1VkuCwge1PSYYDrxYQx6-C35Hj3R7DDQm&export=download"
     },
     {
       "name": "سورة الحديد",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-057.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1_LyvNnD0AM_ixR9TDG2ZF6yXrqMgXxNf&export=download"
     },
     {
       "name": "سورة المجادلة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-058.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1kpFqyx0Zuqmm5AokbO8fNEOY-OPVrC4O&export=download"
     },
     {
       "name": "سورة الحشر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-059.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1SbMEhhNfyHPvPh8gisgOxIYExW2BJZdw&export=download"
     },
     {
       "name": "سورة الممتحنة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-060.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1iMlp008PEkdyA_dZYGPJKVZ156-aXSb6&export=download"
     },
     {
       "name": "سورة الصف",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-061.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1CPDRX-ehJ5Z5WxgYY0jXSLLPNFbnAhle&export=download"
     },
     {
       "name": "سورة الجمعة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-062.ogg"
+      "path":
+          "https://drive.google.com/uc?id=18xVUn7Dv_IRVOALW-D7FFoGr8yIKcrep&export=download"
     },
     {
       "name": "سورة المنافقون",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-063.ogg"
+      "path":
+          "https://drive.google.com/uc?id=19K796RcU31097e4IN4CsZllRTW1XK_2v&export=download"
     },
     {
       "name": "سورة التغابن",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-064.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1PPtPhASEJIXQk7YPeYlOAyvBWPdS3GdN&export=download"
     },
     {
       "name": "سورة الطلاق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-065.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1x8r_8_f12x1w1Hs-byOWtoBLDYL8tHHo&export=download"
     },
     {
       "name": "سورة التحريم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-066.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1tiF3T_RS6y1nLqx0_BWsMsFR844hobCz&export=download"
     },
     {
       "name": "سورة الملك",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-067.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1dOrbzpOcopNUD0CT5HDmyi3l2CqtYlv6&export=download"
     },
     {
       "name": "سورة القلم",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-068.ogg"
+      "path":
+          "https://drive.google.com/uc?id=13JqEgDXBpw0GRWOyscgcO2oUxRybvzQh&export=download"
     },
     {
       "name": "سورة الحاقة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-069.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1v7LuSSmbF-o-w5yneY1y-x6f6OnCEE18&export=download"
     },
     {
       "name": "سورة المعارج",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-070.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1msG01rm9wXawrjLQ3jnoAQJIrUXFeFWU&export=download"
     },
     {
       "name": "سورة نوح",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-071.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1xOg86r9id26ZOA88MpxzjSF0PwEkjzys&export=download"
     },
     {
       "name": "سورة الجن",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-072.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1fJ85je3w0pgBuErMbprSVPjB2R3Pq4TH&export=download"
     },
     {
       "name": "سورة المزمل",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-073.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1Fy-Sn6TIzPQmET0n8ED7n2DYn9Rrw2sT&export=download"
     },
     {
       "name": "سورة المدثر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-074.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1RXKCLFZVlavxVn2McdCwHuZN-b-MX5LI&export=download"
     },
     {
       "name": "سورة القيامة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-075.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1jvi4GZg6D2diPHw9Qyjql-EGYwwSN58U&export=download"
     },
     {
       "name": "سورة الإنسان",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-076.ogg"
+      "path":
+          "https://drive.google.com/uc?id=17vvjoN_u2Pbi_ULbvqou-aU5pEPPw9qM&export=download"
     },
     {
       "name": "سورة المرسلات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-077.ogg"
+      "path":
+          "https://drive.google.com/uc?id=15YdSQm3g2SWVitxaNkr915ljipFDiVXW&export=download"
     },
     {
       "name": "سورة النبأ",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-078.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1KA1aarj9d-P98AhM7OILyxaA0WttReEW&export=download"
     },
     {
       "name": "سورة النازعات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-079.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1VGA2JMSIX04PrTQv29374woY2dpgvlcS&export=download"
     },
     {
       "name": "سورة عبس",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-080.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1ktYTpBCdMOwV5xv1I6wn68K4nTYtT6H2&export=download"
     },
     {
       "name": "سورة التكوير",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-081.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1zDa1Ser7JjyYJ1Hozsr5Mj_xCeSLY9uH&export=download"
     },
     {
       "name": "سورة الإنفطار",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-082.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1JgPU1n5JwY931XhIfjl2tI2t-tmA1E2W&export=download"
     },
     {
       "name": "سورة المطففين",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-083.ogg"
+      "path":
+          "https://drive.google.com/uc?id=11WYEJJcO_Ydvsdm4vIqCepJ7g6LUObED&export=download"
     },
     {
       "name": "سورة الإنشقاق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-084.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1HBq7smsLpZnej37Hvjj8pGMEbh-htLkz&export=download"
     },
     {
       "name": "سورة البروج",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-085.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1u0eu4qQqX688ZTDGgethybYqr-VExb2K&export=download"
     },
     {
       "name": "سورة الطارق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-086.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1JEcnhCj47a7MaZcfb-mYG4uS-wl5o9dH&export=download"
     },
     {
       "name": "سورة الأعلى",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-087.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1xYTZqD60XKQovAG-vqWDWeOCQ_8Dsr6q&export=download"
     },
     {
       "name": "سورة الغاشية",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-088.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1w1_-a4BHh659o8twmV7brxvreBpYxUl2&export=download"
     },
     {
       "name": "سورة الفجر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-089.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1fkGIyLqZ8WFmTeOVy-1-pYOido1rTxG9&export=download"
     },
     {
       "name": "سورة البلد",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-090.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1nVtyjlUs_ZR7l6txkyVmB-bpO9pWn9Ih&export=download"
     },
     {
       "name": "سورة الشمس",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-091.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1EX9sET17l9kKhhEzhaBWtoOoW78El_SK&export=download"
     },
     {
       "name": "سورة الليل",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-092.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1zfU4bOPz84TNrpeAV_2I6k5mjVQuwD_i&export=download"
     },
     {
       "name": "سورة الضحى",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-093.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1az9i29BEJqinOAFPPcT2AjcREQau7AF-&export=download"
     },
     {
       "name": "سورة الشرح",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-094.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1v6EPb9Vbb3MoWpNK2yYTmzXNcOaHeuPI&export=download"
     },
     {
       "name": "سورة التين",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-095.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1FxeDnQ_R6u_EkKvdUIjGZur_FxDjllUz&export=download"
     },
     {
       "name": "سورة العلق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-096.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1kMIPXX9neQwMtYJNI4UwVL6RK-sl7b6D&export=download"
     },
     {
       "name": "سورة القدر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-097.ogg"
+      "path":
+          "https://drive.google.com/uc?id=15mXZpYuFaRuHw4teQ3p4s3PFSg5gnt1C&export=download"
     },
     {
       "name": "سورة البينة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-098.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1Z89o298B1Kb6kzTK3lN-85edRxUs4L9u&export=download"
     },
     {
       "name": "سورة الزلزلة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-099.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1iV4BFU0PADCuJr8xaK2hg0DKe1p5HBmB&export=download"
     },
     {
       "name": "سورة العاديات",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-100.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1UnMTfJPdpspMzRuTi44ISUUCCAu0VgAQ&export=download"
     },
     {
       "name": "سورة القارعة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-101.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1JKVQM2KoNT6msbWEkBN3uVFO2Up1SdTM&export=download"
     },
     {
       "name": "سورة التكاثر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-102.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1VDglqBneOjBuxTChY_ul-cKp9FGr0AJ5&export=download"
     },
     {
       "name": "سورة العصر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-103.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1vjVzxdA9GORlIhSwGy5eHoUIk6KVtRHm&export=download"
     },
     {
       "name": "سورة الهمزة",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-104.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1erVDS3axOpTYV-08WHkqlnp9er7HlGDB&export=download"
     },
     {
       "name": "سورة الفيل",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-105.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1MfV2ux_i7l0Vd_sIRoqOik0Ft1axvLAL&export=download"
     },
     {
       "name": "سورة قريش",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-106.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1D2shoMqirj6tGnvirPypAEsLktSQeOWH&export=download"
     },
     {
       "name": "سورة الماعون",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-107.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1npugVFTd7JNWJcMCUMmChyrgxlCpud2H&export=download"
     },
     {
       "name": "سورة الكوثر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-108.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1mGgGefo3S_g2JMuzQSPFFGwStObSJiKk&export=download"
     },
     {
       "name": "سورة الكافرون",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-109.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1zzCmMuxK4Bqo_YGAovJ-DrIm9zi8YO0g&export=download"
     },
     {
       "name": "سورة النصر",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-110.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1YPdsn2tGDmFa4Nfbx9gG2wc5VJhdNZKr&export=download"
     },
     {
       "name": "سورة المسد",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-111.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1mepaM6igLQ_MOH0XozI7kYwngo8Drie6&export=download"
     },
     {
       "name": "سورة الإخلاص",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-112.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1tbsSlCIperPiMG7bCFTIY-vJ02y9hK4N&export=download"
     },
     {
       "name": "سورة الفلق",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-113.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1KScgfgZrbuIlSBv8GEVIlTiKMEym7vCA&export=download"
     },
     {
       "name": "سورة الناس",
-      "path": "assetsAli/compressed_Quran_Ali_Jaber_studio-114.ogg"
+      "path":
+          "https://drive.google.com/uc?id=1DqMkvE1yLkN1-zewvnw6KSreBi8-bq38&export=download"
     },
   ];
   // متغير لتخزين نص البحث
@@ -1016,6 +1080,7 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
   String _currentSurah = '';
   Map<String, Duration> _currentPositions = {};
   Map<String, Duration> _totalDurations = {};
+  bool _isBuffering = false; // متغير لتحديد حالة التحميل
 
   // متغير لتخزين حالة الوضع (Dark/Light)
   @override
@@ -1030,46 +1095,132 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
 
   @override
   void dispose() {
-    _searchController.dispose(); // تأكد من تفريغ المتحكم عند التخلص من الصفحة
+    _stopAudio(); // إيقاف الصوت عند التخلص من الصفحة
+    _searchController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
-  void _toggleAudio(String surahPath) async {
+  Future<void> _seekAudio(double value, String surahPath) async {
     try {
+      setState(() {
+        _isBuffering = true; // بدء حالة التحميل
+      });
+
+      final position = Duration(seconds: value.toInt());
+      await _audioPlayer.seek(position);
+
+      // تحديث الموضع الحالي بعد التقديم
+      setState(() {
+        _currentPositions[surahPath] = position;
+        _isBuffering = false; // إنهاء حالة التحميل
+      });
+    } catch (e) {
+      setState(() {
+        _isBuffering = false; // إنهاء حالة التحميل في حال حدوث خطأ
+      });
+      print("Error while seeking: $e");
+    }
+  }
+
+  Future<void> _toggleAudio(String surahPath) async {
+    try {
+      // التحقق من الاتصال بالإنترنت
+      var connectivityResult = await Connectivity().checkConnectivity();
+      if (connectivityResult == ConnectivityResult.none) {
+        if (context.mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("خطأ"),
+                content: const Text(
+                    "لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال."),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("حسناً"),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        return; // الخروج من الوظيفة
+      }
+
+      setState(() {
+        _isBuffering = true; // بدء التحميل
+      });
+
+      // التحقق من حالة التشغيل
       if (_isPlaying && _currentSurah == surahPath) {
         await _audioPlayer.pause();
         setState(() {
           _isPlaying = false;
+          _isBuffering = false; // إيقاف التحميل
         });
       } else {
         if (_isPlaying) {
           await _audioPlayer.stop();
         }
-        await _audioPlayer.play(AssetSource(surahPath));
+        await _audioPlayer.play(UrlSource(surahPath));
         setState(() {
           _isPlaying = true;
           _currentSurah = surahPath;
+          _isBuffering = false; // انتهاء التحميل
         });
 
-        // احصل على مدة السورة بعد فترة قصيرة من بدء التشغيل
+        // الحصول على مدة السورة
         Duration? duration = await _audioPlayer.getDuration();
         if (duration != null) {
           setState(() {
-            _totalDurations[surahPath] = duration; // قم بتخزين المدة
+            _totalDurations[surahPath] = duration;
           });
         }
       }
     } catch (e) {
-      print('Error occurred: $e');
+      setState(() {
+        _isBuffering = false; // انتهاء التحميل عند الخطأ
+      });
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("خطأ"),
+              content: Text("حدث خطأ أثناء التشغيل: $e"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("حسناً"),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
   }
 
   void _restartAudio(String surahPath) async {
     await _audioPlayer.stop();
-    await _audioPlayer.play(AssetSource(surahPath));
+    await _audioPlayer.play(UrlSource(surahPath)); // استخدام UrlSource
     setState(() {
       _isPlaying = true;
       _currentSurah = surahPath;
+    });
+  }
+
+  void _stopAudio() async {
+    await _audioPlayer.stop();
+    setState(() {
+      _isPlaying = false;
+      _currentSurah = '';
     });
   }
 
@@ -1079,12 +1230,14 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
 
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      leading: Padding(
-        padding: const EdgeInsets.only(right: 8.0),
-        child: const CircleAvatar(
-          backgroundImage: AssetImage("images/ali.jpg"), // صورة القارئ
-          radius: 50,
-        ),
+      leading: Stack(
+        alignment: Alignment.center,
+        children: [
+          const CircleAvatar(
+            backgroundImage: AssetImage("images/bander.webp"),
+            radius: 50,
+          ),
+        ],
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1101,21 +1254,19 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
                     fontFamily: "Changa",
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white
-                        : Colors
-                            .black, // التبديل بين الأبيض والأسود بناءً على الثيم
+                        : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "- علي جابر", // اسم القارئ
+                  "- بندر بليلة",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.normal,
                     fontFamily: "Changa",
                     color: Theme.of(context).brightness == Brightness.dark
                         ? Colors.white70
-                        : Colors
-                            .black87, // التبديل بين الأبيض والأسود بناءً على الثيم
+                        : Colors.black87,
                   ),
                 ),
               ],
@@ -1149,16 +1300,10 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Slider(
-            value: _currentPositions[surahPath]?.inSeconds.toDouble() ?? 0.0,
-            max: _totalDurations[surahPath]?.inSeconds.toDouble() ?? 1.0,
-            onChanged: (double value) async {
-              final position = Duration(seconds: value.toInt());
-              await _audioPlayer.seek(position);
-              setState(() {
-                _currentPositions[surahPath] =
-                    position; // تحديث السورة المعينة فقط
-              });
-            },
+            value: currentPosition.inSeconds.toDouble(),
+            max: totalDuration.inSeconds.toDouble().clamp(1.0, double.infinity),
+            onChanged: (double value) =>
+                _seekAudio(value, surahPath), // استدعاء الوظيفة المعدلة
           ),
           Text(
             '${_formatDuration(currentPosition)} / ${_formatDuration(totalDuration)}',
@@ -1166,8 +1311,7 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
               fontSize: 16,
               color: Theme.of(context).brightness == Brightness.dark
                   ? Colors.white70
-                  : Colors
-                      .black87, // التبديل بين الأبيض والأسود بناءً على الثيم
+                  : Colors.black87,
             ),
           ),
         ],
@@ -1180,83 +1324,96 @@ class _QuranPageAliJaberState extends State<QuranPageAliJaber> {
     String hours = twoDigits(duration.inHours);
     String minutes = twoDigits(duration.inMinutes.remainder(60));
     String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return '$hours:$minutes:$seconds'; // عرض الساعات أيضًا
+    return hours != "00" ? '$hours:$minutes:$seconds' : '$minutes:$seconds';
   }
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeNotifier>(context);
+
     final filteredSurahs = _surahs.where((surah) {
-      return surah["name"]!.contains(_searchText);
+      return surah["name"]!.toLowerCase().contains(_searchText.toLowerCase());
     }).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? Colors.blue
-            : null, // إذا كان الوضع الداكن مفعلًا، يصبح اللون أزرق، وإلا يكون اللون الافتراضي
-        title: Text(
-          "Quran Recitation - علي جابر",
-          style: TextStyle(
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-            fontFamily: "Changa",
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              context.watch<ThemeNotifier>().isDarkMode
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
+    return WillPopScope(
+      onWillPop: () async {
+        _stopAudio();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: themeProvider.isDarkMode ? Colors.blue : null,
+          title: const Text(
+            "Quran - بندر بليلة",
+            style: TextStyle(
+              fontSize: 25,
+              fontWeight: FontWeight.bold,
+              fontFamily: "Changa",
             ),
-            onPressed: () {
-              context
-                  .read<ThemeNotifier>()
-                  .toggleTheme(); // التبديل بين الوضعين
-            },
           ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _searchController,
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  labelText: 'ابحث عن سورة',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _searchText = value;
-                  });
-                },
+          actions: [
+            IconButton(
+              icon: Icon(
+                themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
               ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredSurahs.length,
-                itemBuilder: (context, index) {
-                  final surah = filteredSurahs[index];
-                  return addSurah(surah["name"]!, surah["path"]!);
-                },
-              ),
+              onPressed: themeProvider.toggleTheme,
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<ThemeNotifier>().toggleTheme(); // التبديل بين الوضعين
-        },
-        child: Icon(
-          context.watch<ThemeNotifier>().isDarkMode
-              ? Icons.wb_sunny
-              : Icons.nights_stay,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextField(
+                      controller: _searchController,
+                      textDirection: TextDirection.rtl,
+                      textAlign: TextAlign.right,
+                      decoration: const InputDecoration(
+                        labelText: 'ابحث عن سورة',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchText = value;
+                        });
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredSurahs.length,
+                      itemBuilder: (context, index) {
+                        final surah = filteredSurahs[index];
+                        return Column(
+                          children: [
+                            addSurah(surah["name"]!, surah["path"]!),
+                            const Divider(
+                              thickness: 2,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              if (_isBuffering)
+                Positioned(
+                  top: 10, // موضع المؤشر بالنسبة للجزء العلوي
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: const Color.fromARGB(255, 157, 65, 231),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
